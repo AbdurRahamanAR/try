@@ -1,4 +1,4 @@
-import FindRestaurant from "./Components/FindRestaurant";
+import FindRestaurant from "../Components/FindRestaurant";
 
 export default function IndexPage() {
   return <FindRestaurant />;

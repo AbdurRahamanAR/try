@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 
-import allResturants from "./mokes/SampleData.json";
-import "./styles.css";
+import allResturants from "../mokes/SampleData.json";
 
 const normalizedTextForMatch = (text) => {
   return text.trim().toLowerCase();
 };
 
+// Get location and itemName from user input
 const searchStringToTownAndItemName = (input) => {
   const [item, location] = input.split("in");
 
