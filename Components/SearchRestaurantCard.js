@@ -3,6 +3,7 @@ import React from 'react'
 export default function SearchRestaurantCard({restaurant, handleSelectItem}) {
   return (
     <div
+      key={restaurant.Id}
       style={{
         width: "calc(100% - 30px)",
         textAlign: "left",
@@ -22,29 +23,38 @@ export default function SearchRestaurantCard({restaurant, handleSelectItem}) {
         </p>
       </div>
      
-      <div>
-        {restaurant.matchesMenuItems.map((menuItem) => {
+      <div style={{paddingLeft: 20}}>
+        {restaurant.matchesCategoriesAndMenuItems?.map((categorie, index)=> {
           return (
-            <label 
-              key={menuItem.Id} 
-              style={{ 
-                display: "block", 
-                fontSize: 16, 
-                marginBottom: 15
-              }}
-            >
-              <input
-                type="checkbox"
-                name={menuItem.Name}
-                value={menuItem.Id}
-                onChange={()=> {
-                  handleSelectItem(menuItem)
-                }}
-              />
-              <span>&nbsp;{menuItem.Name}.</span>&nbsp;
-              <span>R{menuItem.Price}</span>
-            </label>
-          );
+            <div key={categorie.Name + index}>
+              <p style={{fontWeight:"bold"}}>{categorie.Name}</p>
+              <div style={{paddingLeft: 15}}>
+                {categorie.MenuItems.map((menuItem) => {
+                  return (
+                    <label 
+                      key={menuItem.Id} 
+                      style={{ 
+                        display: "block", 
+                        fontSize: 16, 
+                        marginBottom: 15
+                      }}
+                    >
+                      <input
+                        type="checkbox"
+                        name={menuItem.Name}
+                        value={menuItem.Id}
+                        onChange={()=> {
+                          handleSelectItem(menuItem)
+                        }}
+                      />
+                      <span>&nbsp;{menuItem.Name}.</span>&nbsp;
+                      <span>R{menuItem.Price}</span>
+                    </label>
+                  );
+                })}
+              </div>
+            </div>
+          )
         })}
       </div>
     </div>

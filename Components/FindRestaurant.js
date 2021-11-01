@@ -42,17 +42,43 @@ export default function FindRestaurant() {
             return normalizedTextForMatch(item.City).includes(location);
           })
           .map((item) => {
-            let matchesMenuItems = [];
+            let matchesCategoriesAndMenuItems = [];
             let found = false;
+            let itemCount = 0
             item.Categories.forEach((categorie) => {
               if (normalizedTextForMatch(categorie.Name).includes(itemName)) {
                 found = true;
-                matchesMenuItems = [...matchesMenuItems, ...categorie.MenuItems];
+                itemCount += categorie.MenuItems.length
+                matchesCategoriesAndMenuItems = [
+                  ...matchesCategoriesAndMenuItems, 
+                  categorie
+                ];
               } else {
                 categorie.MenuItems.forEach((menuItem) => {
                   if (normalizedTextForMatch(menuItem.Name).includes(itemName)) {
                     found = true;
-                    matchesMenuItems = [...matchesMenuItems, menuItem];
+                    itemCount += 1
+                    const categoryAlreadyAdd = matchesCategoriesAndMenuItems.find(matchCategore=>{
+                      return matchCategore.id === categorie.id
+                    })
+                    const menuWithCategore = !!categoryAlreadyAdd 
+                      ? 
+                        {
+                          ...categoryAlreadyAdd,
+                          MenuItems: [
+                            ...categoryAlreadyAdd.MenuItems,
+                            menuItem
+                          ]
+                        }
+                      :
+                        {
+                          ...categorie,
+                          MenuItems: [menuItem]
+                        }
+                    matchesCategoriesAndMenuItems = [
+                      ...matchesCategoriesAndMenuItems, 
+                      menuWithCategore
+                    ];
                   }
                 });
               }
@@ -60,12 +86,15 @@ export default function FindRestaurant() {
             if (found) {
               return {
                 ...item,
-                matchesMenuItems
+                matchesCategoriesAndMenuItems,
+                itemCount
               };
             }
             return found;
           })
-          .filter((item) => item);  
+          .filter((item) => item)
+          .sort((a, b)=> (b.itemCount - a.itemCount) + (b.Rank - a.Rank))
+          // .sort((a, b)=> b.Rank - a.Rank)
       });
   }, [searchData]);
 
@@ -124,7 +153,7 @@ export default function FindRestaurant() {
             veiwRestaurants.map((restaurant) => {
               return (
                 <SearchRestaurantCard 
-                  key={restaurant.ID} 
+                  key={restaurant.Id} 
                   restaurant={restaurant} 
                   handleSelectItem={handleSelectItem}
                 />
