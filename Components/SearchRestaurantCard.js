@@ -1,6 +1,12 @@
 import React from 'react'
 
-export default function SearchRestaurantCard({restaurant, handleSelectItem}) {
+export default function SearchRestaurantCard({
+  restaurant, 
+  handleSelectItem, 
+  removeSelectItem,
+  selectedItems
+}) {
+
   return (
     <div
       key={restaurant.Id}
@@ -43,8 +49,15 @@ export default function SearchRestaurantCard({restaurant, handleSelectItem}) {
                         type="checkbox"
                         name={menuItem.Name}
                         value={menuItem.Id}
-                        onChange={()=> {
-                          handleSelectItem(menuItem)
+                        defaultChecked={
+                          !!selectedItems.find(selectedItem=>selectedItem.Id === menuItem.Id)
+                        }
+                        onChange={(e)=> {
+                          if(e.target.checked) {
+                            handleSelectItem(menuItem)
+                          } else {
+                            removeSelectItem(menuItem)
+                          }
                         }}
                       />
                       <span>&nbsp;{menuItem.Name}.</span>&nbsp;

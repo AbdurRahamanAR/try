@@ -25,13 +25,17 @@ export default function FindRestaurant() {
     location: ""
   });
   const [veiwRestaurants, setVeiwRestaurants] = useState();
-  const [selectedItem, setSelectedItem] = useState([])
+  const [selectedItems, setSelectedItems] = useState([])
   const [showSuccessModal, setShowSuccessModal] = useState(false)
 
   const toggleSuccessModal = ()=> setShowSuccessModal(state=>!state)
 
   const handleSelectItem = (item)=> {
-    setSelectedItem(state=>[...state, item])
+    setSelectedItems(state=>[...state, item])
+  }
+
+  const handleRemoveSelectItem = (item)=> {
+    setSelectedItems(state=>state.filter(prevItem=>prevItem.Id !== item.Id))
   }
 
   useEffect(() => {
@@ -100,11 +104,11 @@ export default function FindRestaurant() {
 
   const totalPrice = useMemo(()=>{
     let total = 0
-    selectedItem.forEach(item=>{
+    selectedItems.forEach(item=>{
       total += item.Price
     })
     return total
-  }, [selectedItem])
+  }, [selectedItems])
 
   const handleSearchTextChange = (e) => {
     const newValue = e.target.value;
@@ -112,33 +116,51 @@ export default function FindRestaurant() {
     setSearchData(searchStringToTownAndItemName(newValue));
   };
 
+  const handleSubmit = (e)=> {
+    e.preventDefault();
+    if(selectedItems.length > 0) {
+      toggleSuccessModal()
+    } else {
+      alert("Please select at least one item.")
+    }
+  }
+
   return (
     <>
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          if(selectedItem.length > 0) {
-            toggleSuccessModal()
-          } else {
-            alert("Please select at least one item.")
-          }
-        }}
+      <div
         style={{
           fontFamily: "sans-serif",
           padding: 15
         }}
       >
-        <input 
-          value={searchInput} 
-          onChange={handleSearchTextChange} 
+        <div
           style={{
-            height: 30,
-            width: "100%",
-            marginBottom: 35,
-            paddingLeft: 8
+            position: "relative"
           }}
-          placeholder="Burger in crap town"
-        />
+        >
+          <input 
+            value={searchInput} 
+            onChange={handleSearchTextChange} 
+            style={{
+              height: 30,
+              width: "100%",
+              marginBottom: 35,
+              paddingLeft: 8
+            }}
+          />
+          
+          <img 
+            style={{
+              width: 25, 
+              height: 25,
+              position:"absolute",
+              right: 0,
+              top: 5
+            }} 
+            src="/search.png" 
+            alt="search" 
+          />
+        </div>
 
         {searchData.itemName?.length > 0 && (
           <h4>
@@ -155,7 +177,9 @@ export default function FindRestaurant() {
                 <SearchRestaurantCard 
                   key={restaurant.Id} 
                   restaurant={restaurant} 
+                  selectedItems={selectedItems}
                   handleSelectItem={handleSelectItem}
+                  removeSelectItem={handleRemoveSelectItem}
                 />
               );
             })}
@@ -171,7 +195,6 @@ export default function FindRestaurant() {
           }}
         >
           <button 
-            type="submit"
             style={{
               height: 40,
               width: 150,
@@ -182,9 +205,10 @@ export default function FindRestaurant() {
               fontSize: 18,
               fontWeight: "bold"
             }}
+            onClick={handleSubmit}
           >Order - R{totalPrice}</button>
         </div>
-      </form>
+      </div>
 
       <Modal show={showSuccessModal} onClose={toggleSuccessModal}>
         <div style={{display: "flex", paddingBottom: 20, flexDirection: "column", alignItems: "center"}}>
